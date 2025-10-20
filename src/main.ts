@@ -36,55 +36,49 @@ import "./style.css";
   shop.style.gap = "8px";
   appRoot.appendChild(shop);
 
+  interface Item {
+    name: string;
+    cost: number;
+    rate: number;
+    count: number;
+  }
+
   const inc = 1.15;
-  const items = {
-    A: { baseCost: 10, rate: 0.1, count: 0, label: "Syrup Drizzle (+0.1/sec)" },
-    B: { baseCost: 100, rate: 2.0, count: 0, label: "Toaster (+2/sec)" },
-    C: {
-      baseCost: 1000,
-      rate: 50.0,
-      count: 0,
-      label: "Breakfast Cart (+50/sec)",
-    },
-  };
 
-  const costNow = (base: number, n: number) => base * Math.pow(inc, n);
+  const availableItems: Item[] = [
+    { name: "Syrup Drizzle", cost: 10, rate: 0.1, count: 0 },
+    { name: "Toaster", cost: 100, rate: 2.0, count: 0 },
+    { name: "Breakfast Cart", cost: 1000, rate: 50.0, count: 0 },
+  ];
 
-  const btnA = document.createElement("button");
-  btnA.style.fontFamily = "Arial, sans-serif";
-  btnA.style.padding = "6px 10px";
+  const price = (base: number, n: number) => base * Math.pow(inc, n);
 
-  const btnB = document.createElement("button");
-  btnB.style.fontFamily = "Arial, sans-serif";
-  btnB.style.padding = "6px 10px";
-
-  const btnC = document.createElement("button");
-  btnC.style.fontFamily = "Arial, sans-serif";
-  btnC.style.padding = "6px 10px";
-
-  shop.appendChild(btnA);
-  shop.appendChild(btnB);
-  shop.appendChild(btnC);
+  const buttons: HTMLButtonElement[] = [];
+  for (let i = 0; i < availableItems.length; i++) {
+    const b = document.createElement("button");
+    b.style.fontFamily = "Arial, sans-serif";
+    b.style.padding = "6px 10px";
+    buttons.push(b);
+    shop.appendChild(b);
+  }
 
   const render = () => {
-    ratePerSecond = items.A.count * items.A.rate +
-      items.B.count * items.B.rate + items.C.count * items.C.rate;
+    ratePerSecond = availableItems.reduce(
+      (sum, it) => sum + it.rate * it.count,
+      0,
+    );
     counterEl.textContent = `${counter.toFixed(2)} ${UNIT}`;
-    status.textContent = `+${
-      ratePerSecond.toFixed(2)
-    } ${UNIT}/sec | Syrup:${items.A.count} Toaster:${items.B.count} Cart:${items.C.count}`;
+    status.textContent = `+${ratePerSecond.toFixed(2)} ${UNIT}/sec | ` +
+      availableItems.map((it) => `${it.name}:${it.count}`).join(" ");
 
-    const aCost = costNow(items.A.baseCost, items.A.count);
-    const bCost = costNow(items.B.baseCost, items.B.count);
-    const cCost = costNow(items.C.baseCost, items.C.count);
-
-    btnA.textContent = `${items.A.label} – ${aCost.toFixed(2)}`;
-    btnB.textContent = `${items.B.label} – ${bCost.toFixed(2)}`;
-    btnC.textContent = `${items.C.label} – ${cCost.toFixed(2)}`;
-
-    btnA.disabled = counter < aCost;
-    btnB.disabled = counter < bCost;
-    btnC.disabled = counter < cCost;
+    for (let i = 0; i < availableItems.length; i++) {
+      const it = availableItems[i];
+      const costNow = price(it.cost, it.count);
+      buttons[i].textContent = `${it.name} (+${it.rate}/sec) – ${
+        costNow.toFixed(2)
+      }`;
+      buttons[i].disabled = counter < costNow;
+    }
   };
 
   btn.addEventListener("click", () => {
@@ -92,19 +86,17 @@ import "./style.css";
     render();
   });
 
-  const buy = (key: "A" | "B" | "C") => {
-    const it = items[key];
-    const price = costNow(it.baseCost, it.count);
-    if (counter >= price) {
-      counter -= price;
-      it.count += 1;
-      render();
-    }
-  };
-
-  btnA.addEventListener("click", () => buy("A"));
-  btnB.addEventListener("click", () => buy("B"));
-  btnC.addEventListener("click", () => buy("C"));
+  for (let i = 0; i < availableItems.length; i++) {
+    buttons[i].addEventListener("click", () => {
+      const it = availableItems[i];
+      const costNow = price(it.cost, it.count);
+      if (counter >= costNow) {
+        counter -= costNow;
+        it.count += 1;
+        render();
+      }
+    });
+  }
 
   let lastTs: number | null = null;
   const frame = (ts: number) => {
