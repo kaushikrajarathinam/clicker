@@ -1,7 +1,8 @@
 import "./style.css";
 
 (() => {
-  const appRoot = (document.querySelector<HTMLElement>("#app")) ?? document.body;
+  const appRoot = (document.querySelector<HTMLElement>("#app")) ??
+    document.body;
 
   const btn = document.createElement("button");
   btn.innerHTML = "🧇";
@@ -36,11 +37,10 @@ import "./style.css";
   appRoot.appendChild(shop);
 
   const inc = 1.15;
-
   const items = {
-    A: { baseCost: 10, rate: 0.1, count: 0 },
-    B: { baseCost: 100, rate: 2.0, count: 0 },
-    C: { baseCost: 1000, rate: 50.0, count: 0 },
+    A: { baseCost: 10, rate: 0.1, count: 0, label: "Syrup Drizzle (+0.1/sec)" },
+    B: { baseCost: 100, rate: 2.0, count: 0, label: "Toaster (+2/sec)" },
+    C: { baseCost: 1000, rate: 50.0, count: 0, label: "Breakfast Cart (+50/sec)",},
   };
 
   const costNow = (base: number, n: number) => base * Math.pow(inc, n);
@@ -62,21 +62,20 @@ import "./style.css";
   shop.appendChild(btnC);
 
   const render = () => {
-    ratePerSecond =
-      items.A.count * items.A.rate +
-      items.B.count * items.B.rate +
-      items.C.count * items.C.rate;
-
+    ratePerSecond = items.A.count * items.A.rate +
+      items.B.count * items.B.rate + items.C.count * items.C.rate;
     counterEl.textContent = `${counter.toFixed(2)} ${UNIT}`;
-    status.textContent = `+${ratePerSecond.toFixed(2)} ${UNIT}/sec | A:${items.A.count} B:${items.B.count} C:${items.C.count}`;
+    status.textContent = `+${
+      ratePerSecond.toFixed(2)
+    } ${UNIT}/sec | Syrup:${items.A.count} Toaster:${items.B.count} Cart:${items.C.count}`;
 
     const aCost = costNow(items.A.baseCost, items.A.count);
     const bCost = costNow(items.B.baseCost, items.B.count);
     const cCost = costNow(items.C.baseCost, items.C.count);
 
-    btnA.textContent = `A (+0.1/sec) – ${aCost.toFixed(2)}`;
-    btnB.textContent = `B (+2/sec) – ${bCost.toFixed(2)}`;
-    btnC.textContent = `C (+50/sec) – ${cCost.toFixed(2)}`;
+    btnA.textContent = `${items.A.label} – ${aCost.toFixed(2)}`;
+    btnB.textContent = `${items.B.label} – ${bCost.toFixed(2)}`;
+    btnC.textContent = `${items.C.label} – ${cCost.toFixed(2)}`;
 
     btnA.disabled = counter < aCost;
     btnB.disabled = counter < bCost;
@@ -107,7 +106,6 @@ import "./style.css";
     if (lastTs === null) lastTs = ts;
     const dt = (ts - lastTs) / 1000;
     lastTs = ts;
-
     if (ratePerSecond > 0) counter += ratePerSecond * dt;
     render();
     requestAnimationFrame(frame);
