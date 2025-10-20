@@ -1,8 +1,7 @@
 import "./style.css";
 
 (() => {
-  const appRoot = (document.querySelector<HTMLElement>("#app")) ??
-    document.body;
+  const appRoot = (document.querySelector<HTMLElement>("#app")) ?? document.body;
 
   const btn = document.createElement("button");
   btn.innerHTML = "🧇";
@@ -36,24 +35,25 @@ import "./style.css";
   shop.style.gap = "8px";
   appRoot.appendChild(shop);
 
+  const inc = 1.15;
+
   const items = {
-    A: { cost: 10, rate: 0.1, count: 0 },
-    B: { cost: 100, rate: 2.0, count: 0 },
-    C: { cost: 1000, rate: 50.0, count: 0 },
+    A: { baseCost: 10, rate: 0.1, count: 0 },
+    B: { baseCost: 100, rate: 2.0, count: 0 },
+    C: { baseCost: 1000, rate: 50.0, count: 0 },
   };
 
+  const costNow = (base: number, n: number) => base * Math.pow(inc, n);
+
   const btnA = document.createElement("button");
-  btnA.textContent = "A (+0.1/sec) – 10";
   btnA.style.fontFamily = "Arial, sans-serif";
   btnA.style.padding = "6px 10px";
 
   const btnB = document.createElement("button");
-  btnB.textContent = "B (+2/sec) – 100";
   btnB.style.fontFamily = "Arial, sans-serif";
   btnB.style.padding = "6px 10px";
 
   const btnC = document.createElement("button");
-  btnC.textContent = "C (+50/sec) – 1000";
   btnC.style.fontFamily = "Arial, sans-serif";
   btnC.style.padding = "6px 10px";
 
@@ -62,13 +62,25 @@ import "./style.css";
   shop.appendChild(btnC);
 
   const render = () => {
+    ratePerSecond =
+      items.A.count * items.A.rate +
+      items.B.count * items.B.rate +
+      items.C.count * items.C.rate;
+
     counterEl.textContent = `${counter.toFixed(2)} ${UNIT}`;
-    status.textContent = `+${
-      ratePerSecond.toFixed(2)
-    } ${UNIT}/sec | A:${items.A.count} B:${items.B.count} C:${items.C.count}`;
-    btnA.disabled = counter < items.A.cost;
-    btnB.disabled = counter < items.B.cost;
-    btnC.disabled = counter < items.C.cost;
+    status.textContent = `+${ratePerSecond.toFixed(2)} ${UNIT}/sec | A:${items.A.count} B:${items.B.count} C:${items.C.count}`;
+
+    const aCost = costNow(items.A.baseCost, items.A.count);
+    const bCost = costNow(items.B.baseCost, items.B.count);
+    const cCost = costNow(items.C.baseCost, items.C.count);
+
+    btnA.textContent = `A (+0.1/sec) – ${aCost.toFixed(2)}`;
+    btnB.textContent = `B (+2/sec) – ${bCost.toFixed(2)}`;
+    btnC.textContent = `C (+50/sec) – ${cCost.toFixed(2)}`;
+
+    btnA.disabled = counter < aCost;
+    btnB.disabled = counter < bCost;
+    btnC.disabled = counter < cCost;
   };
 
   btn.addEventListener("click", () => {
@@ -78,11 +90,10 @@ import "./style.css";
 
   const buy = (key: "A" | "B" | "C") => {
     const it = items[key];
-    if (counter >= it.cost) {
-      counter -= it.cost;
+    const price = costNow(it.baseCost, it.count);
+    if (counter >= price) {
+      counter -= price;
       it.count += 1;
-      ratePerSecond = items.A.count * items.A.rate +
-        items.B.count * items.B.rate + items.C.count * items.C.rate;
       render();
     }
   };
@@ -97,16 +108,11 @@ import "./style.css";
     const dt = (ts - lastTs) / 1000;
     lastTs = ts;
 
-    if (ratePerSecond > 0) {
-      counter += ratePerSecond * dt;
-    }
+    if (ratePerSecond > 0) counter += ratePerSecond * dt;
     render();
-
     requestAnimationFrame(frame);
   };
 
   render();
   requestAnimationFrame(frame);
 })();
-
-// code space keeps breaking, very ineffective use.
