@@ -40,7 +40,12 @@ import "./style.css";
   const items = {
     A: { baseCost: 10, rate: 0.1, count: 0, label: "Syrup Drizzle (+0.1/sec)" },
     B: { baseCost: 100, rate: 2.0, count: 0, label: "Toaster (+2/sec)" },
-    C: { baseCost: 1000, rate: 50.0, count: 0, label: "Breakfast Cart (+50/sec)",},
+    C: {
+      baseCost: 1000,
+      rate: 50.0,
+      count: 0,
+      label: "Breakfast Cart (+50/sec)",
+    },
   };
 
   const costNow = (base: number, n: number) => base * Math.pow(inc, n);
