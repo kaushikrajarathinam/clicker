@@ -4,16 +4,17 @@ import "./style.css";
   const appRoot = (document.querySelector<HTMLElement>("#app")) ??
     document.body;
 
-  const btn = document.createElement("button");
-  btn.innerHTML = "🧇";
-  btn.setAttribute("aria-label", "Add one waffle");
-  btn.style.fontSize = "24px";
-  btn.style.fontFamily = "Arial, sans-serif";
-  btn.style.padding = "8px 12px";
-  btn.style.marginTop = "8px";
-  appRoot.appendChild(btn);
+  const addBtn = document.createElement("button");
+  addBtn.innerHTML = "🧇";
+  addBtn.setAttribute("aria-label", "Add one waffle");
+  addBtn.style.fontSize = "24px";
+  addBtn.style.fontFamily = "Arial, sans-serif";
+  addBtn.style.padding = "8px 12px";
+  addBtn.style.marginTop = "8px";
+  appRoot.appendChild(addBtn);
 
-  const UNIT = "waffles";
+  const UNIT_LABEL = "waffles";
+  const CLICK_INCREMENT = 1;
   let counter: number = 0;
   let ratePerSecond = 0;
 
@@ -30,12 +31,12 @@ import "./style.css";
   counterEl.style.fontFamily = "Arial, sans-serif";
   appRoot.appendChild(counterEl);
 
-  const shop = document.createElement("div");
-  shop.style.marginTop = "10px";
-  shop.style.display = "flex";
-  shop.style.flexDirection = "column";
-  shop.style.gap = "10px";
-  appRoot.appendChild(shop);
+  const shopEl = document.createElement("div");
+  shopEl.style.marginTop = "10px";
+  shopEl.style.display = "flex";
+  shopEl.style.flexDirection = "column";
+  shopEl.style.gap = "10px";
+  appRoot.appendChild(shopEl);
 
   interface Item {
     name: string;
@@ -45,7 +46,7 @@ import "./style.css";
     description: string;
   }
 
-  const inc = 1.15;
+  const PRICE_GROWTH = 1.15;
 
   const availableItems: Item[] = [
     {
@@ -87,7 +88,7 @@ import "./style.css";
     },
   ];
 
-  const price = (base: number, n: number) => base * Math.pow(inc, n);
+  const price = (base: number, n: number) => base * Math.pow(PRICE_GROWTH, n);
 
   const computeRate = (items: Item[]) =>
     items.reduce((sum, it) => sum + it.rate * it.count, 0);
@@ -121,15 +122,15 @@ import "./style.css";
 
     row.appendChild(b);
     row.appendChild(d);
-    shop.appendChild(row);
+    shopEl.appendChild(row);
     buttons.push({ button: b, desc: d });
   }
 
   const render = () => {
     ratePerSecond = computeRate(availableItems);
 
-    counterEl.textContent = `${counter.toFixed(2)} ${UNIT}`;
-    status.textContent = `+${ratePerSecond.toFixed(2)} ${UNIT}/sec | ` +
+    counterEl.textContent = `${counter.toFixed(2)} ${UNIT_LABEL}`;
+    status.textContent = `+${ratePerSecond.toFixed(2)} ${UNIT_LABEL}/sec | ` +
       availableItems.map((it) => `${it.name}:${it.count}`).join(" ");
 
     for (let i = 0; i < availableItems.length; i++) {
@@ -143,8 +144,8 @@ import "./style.css";
     }
   };
 
-  btn.addEventListener("click", () => {
-    counter += 1;
+  addBtn.addEventListener("click", () => {
+    counter += CLICK_INCREMENT;
     render();
   });
 
