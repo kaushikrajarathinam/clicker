@@ -7,37 +7,29 @@ import "./style.css";
   const addBtn = document.createElement("button");
   addBtn.innerHTML = "🧇";
   addBtn.setAttribute("aria-label", "Add one waffle");
-  addBtn.style.fontSize = "24px";
-  addBtn.style.fontFamily = "Arial, sans-serif";
-  addBtn.style.padding = "8px 12px";
-  addBtn.style.marginTop = "8px";
+  addBtn.className = "btn";
   appRoot.appendChild(addBtn);
 
+  // Labels and counters
   const UNIT_LABEL = "waffles";
   const CLICK_INCREMENT = 1;
   let counter: number = 0;
   let ratePerSecond = 0;
 
   const status = document.createElement("div");
-  status.style.marginTop = "8px";
-  status.style.fontSize = "16px";
-  status.style.fontFamily = "Arial, sans-serif";
+  status.className = "status";
   appRoot.appendChild(status);
 
   const counterEl = document.createElement("div");
   counterEl.id = "counter";
-  counterEl.style.marginTop = "8px";
-  counterEl.style.fontSize = "18px";
-  counterEl.style.fontFamily = "Arial, sans-serif";
+  counterEl.className = "counter";
   appRoot.appendChild(counterEl);
 
   const shopEl = document.createElement("div");
-  shopEl.style.marginTop = "10px";
-  shopEl.style.display = "flex";
-  shopEl.style.flexDirection = "column";
-  shopEl.style.gap = "10px";
+  shopEl.className = "shop";
   appRoot.appendChild(shopEl);
 
+  // Types and constants
   interface Item {
     name: string;
     cost: number;
@@ -88,12 +80,14 @@ import "./style.css";
     },
   ];
 
+  // helpers
   const price = (base: number, n: number) => base * Math.pow(PRICE_GROWTH, n);
 
   const computeRate = (items: Item[]) =>
     items.reduce((sum, it) => sum + it.rate * it.count, 0);
 
   const canAfford = (total: number, cost: number) => total >= cost;
+
   const tryPurchase = (
     total: number,
     it: Item,
@@ -106,19 +100,14 @@ import "./style.css";
   const buttons: { button: HTMLButtonElement; desc: HTMLDivElement }[] = [];
   for (let i = 0; i < availableItems.length; i++) {
     const row = document.createElement("div");
-    row.style.display = "flex";
-    row.style.flexDirection = "column";
-    row.style.gap = "4px";
+    row.className = "stack";
 
     const b = document.createElement("button");
-    b.style.fontFamily = "Arial, sans-serif";
-    b.style.padding = "6px 10px";
+    b.className = "itemBtn";
     b.title = availableItems[i].description;
 
     const d = document.createElement("div");
-    d.style.fontFamily = "Arial, sans-serif";
-    d.style.fontSize = "12px";
-    d.style.opacity = "0.85";
+    d.className = "meta";
 
     row.appendChild(b);
     row.appendChild(d);
@@ -144,6 +133,7 @@ import "./style.css";
     }
   };
 
+  // Events
   addBtn.addEventListener("click", () => {
     counter += CLICK_INCREMENT;
     render();
@@ -161,6 +151,7 @@ import "./style.css";
     });
   }
 
+  // Animation Loop
   let lastTs: number | null = null;
   const frame = (ts: number) => {
     if (lastTs === null) lastTs = ts;
